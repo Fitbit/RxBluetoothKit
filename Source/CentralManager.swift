@@ -1,4 +1,5 @@
 import Foundation
+import RxRelay
 import RxSwift
 import CoreBluetooth
 
@@ -45,6 +46,11 @@ public class CentralManager: ManagerType {
     /// Connector instance is used for establishing connection with peripherals
     private let connector: Connector
 
+    /// Relay that emits when the Bluetooth state changes. Replays the last emitted state.
+    private let stateRelay: BehaviorRelay<BluetoothState>
+
+    private let disposeBag = DisposeBag()
+
     // MARK: Initialization
 
     /// Creates new `CentralManager`
@@ -63,6 +69,12 @@ public class CentralManager: ManagerType {
         self.peripheralProvider = peripheralProvider
         self.connector = connector
         centralManager.delegate = delegateWrapper
+
+        self.stateRelay = BehaviorRelay(value: BluetoothState(rawValue: centralManager.state.rawValue) ?? .unknown)
+
+        self.delegateWrapper.didUpdateState.asObservable()
+            .bind(to: self.stateRelay)
+            .disposed(by: disposeBag)
     }
 
     /// Creates new `CentralManager` instance. By default all operations and events are executed and received on main thread.
@@ -96,23 +108,15 @@ public class CentralManager: ManagerType {
     // MARK: State
 
     public var state: BluetoothState {
-        return BluetoothState(rawValue: manager.state.rawValue) ?? .unknown
+        return stateRelay.value
     }
 
     public func observeState() -> Observable<BluetoothState> {
-        return self.delegateWrapper.didUpdateState.asObservable()
+        return observeStateWithInitialValue().skip(1)
     }
 
     public func observeStateWithInitialValue() -> Observable<BluetoothState> {
-        return Observable.deferred { [weak self] in
-            guard let self = self else {
-                RxBluetoothKitLog.w("observeState - CentralManager deallocated")
-                return .never()
-            }
-
-            return self.delegateWrapper.didUpdateState.asObservable()
-                .startWith(self.state)
-        }
+        return stateRelay.asObservable()
     }
 
     // MARK: Scanning
