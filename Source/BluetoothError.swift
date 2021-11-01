@@ -86,9 +86,9 @@ extension BluetoothError: CustomStringConvertible {
             connection (previously establishConnection subscription was not disposed).
             """
         case let .peripheralConnectionFailed(_, err):
-            return "Connection error has occured: \(err?.localizedDescription ?? "-")"
+            return "Connection failed with error: \(err?.localizedDescription ?? "-")"
         case let .peripheralDisconnected(_, err):
-            return "Connection error has occured: \(err?.localizedDescription ?? "-")"
+            return "Peripheral disconnected with error: \(err?.localizedDescription ?? "-")"
         case let .peripheralRSSIReadFailed(_, err):
             return "RSSI read failed : \(err?.localizedDescription ?? "-")"
         // Services
