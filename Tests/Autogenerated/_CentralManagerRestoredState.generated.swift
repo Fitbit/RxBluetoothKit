@@ -61,7 +61,16 @@ struct _CentralManagerRestoredState: CentralManagerRestoredStateType {
         let cbServices = arrayOfAnyObjects.flatMap { $0 as? CBServiceMock }
         #endif
 
-        return cbServices.map { _Service(peripheral: centralManager.retrievePeripheral(for: $0.peripheral),
-                                        service: $0) }
+        return cbServices.compactMap { cbService -> _Service? in
+            do {
+                return _Service(
+                    peripheral: centralManager.retrievePeripheral(for: try cbService.unwrapPeripheral()),
+                    service: cbService
+                )
+            } catch {
+                RxBluetoothKitLog.e("Failed to restore service \(cbService.logDescription) with error \(error)")
+                return nil
+            }
+        }
     }
 }

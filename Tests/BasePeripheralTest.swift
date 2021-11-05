@@ -12,8 +12,10 @@ class BasePeripheralTest: XCTestCase {
     
     override func setUp() {
         super.setUp()
-        
-        centralManagerMock = _CentralManager()
+
+        let managerMock = CBCentralManagerMock()
+        managerMock.state = .poweredOn
+        centralManagerMock = _CentralManager(queue: .main, options: nil, cbCentralManager: managerMock)
         let peripheralMock = CBPeripheralMock()
         let delegateWrapperMock = CBPeripheralDelegateWrapperMock()
         let notificationManager = CharacteristicNotificationManagerMock(peripheral: peripheralMock, delegateWrapper: delegateWrapperMock)

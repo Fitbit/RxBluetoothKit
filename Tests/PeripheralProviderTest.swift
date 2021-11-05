@@ -8,7 +8,9 @@ class PeripheralProviderTest: XCTestCase {
     override func setUp() {
         super.setUp()
         provider = _PeripheralProvider()
-        centralManager = _CentralManager()
+        let managerMock = CBCentralManagerMock()
+        managerMock.state = .poweredOn
+        centralManager = _CentralManager(queue: .main, options: nil, cbCentralManager: managerMock)
     }
     
     func testPeripheralWrapperReuse() {

@@ -41,8 +41,8 @@ class _Characteristic {
         self.service = service
     }
 
-    convenience init(characteristic: CBCharacteristicMock, peripheral: _Peripheral) {
-        let service = _Service(peripheral: peripheral, service: characteristic.service)
+    convenience init(characteristic: CBCharacteristicMock, peripheral: _Peripheral) throws {
+        let service = _Service(peripheral: peripheral, service: try characteristic.unwrapService())
         self.init(characteristic: characteristic, service: service)
     }
 
@@ -190,4 +190,15 @@ extension _Characteristic: UUIDIdentifiable {}
 /// - returns: True if both characteristics are the same.
 func == (lhs: _Characteristic, rhs: _Characteristic) -> Bool {
     return lhs.characteristic == rhs.characteristic
+}
+
+extension CBCharacteristicMock {
+    /// Unwrap the parent service or throw if the service is nil
+    func unwrapService() throws -> CBServiceMock {
+        guard let cbService = service as CBServiceMock? else {
+            throw _BluetoothError.serviceDeallocated
+        }
+
+        return cbService
+    }
 }

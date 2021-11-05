@@ -157,7 +157,10 @@ class CharacteristicNotificationManagerTest: XCTestCase {
     // MARK: - Utils
     
     private func createAndSetUpObservable(characteristicMock: CBCharacteristicMock, time: ObservableScheduleTimes = ObservableScheduleTimes()) -> (_Characteristic, ScheduledObservable<_Characteristic>) {
-        let peripheral = _Peripheral(manager: _CentralManager(), peripheral: peripheralMock, delegateWrapper: wrapperMock)
+        let managerMock = CBCentralManagerMock()
+        managerMock.state = .poweredOn
+        let manager = _CentralManager(queue: .main, options: nil, cbCentralManager: managerMock)
+        let peripheral = _Peripheral(manager: manager, peripheral: peripheralMock, delegateWrapper: wrapperMock)
         let service = _Service(peripheral: peripheral, service: CBServiceMock())
         let characteristic = _Characteristic(characteristic: characteristicMock, service: service)
         let observer: ScheduledObservable<_Characteristic> = testScheduler.scheduleObservable(time: time) {

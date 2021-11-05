@@ -25,16 +25,19 @@ public enum BluetoothError: Error {
     case peripheralConnectionFailed(Peripheral, Error?)
     case peripheralDisconnected(Peripheral, Error?)
     case peripheralRSSIReadFailed(Peripheral, Error?)
+    case peripheralDeallocated
     // Services
     case servicesDiscoveryFailed(Peripheral, Error?)
     case includedServicesDiscoveryFailed(Peripheral, Error?)
     case addingServiceFailed(CBService, Error?)
+    case serviceDeallocated
     // Characteristics
     case characteristicsDiscoveryFailed(Service, Error?)
     case characteristicWriteFailed(Characteristic, Error?)
     case characteristicReadFailed(Characteristic, Error?)
     case characteristicNotifyChangeFailed(Characteristic, Error?)
     case characteristicSetNotifyValueFailed(Characteristic, Error?)
+    case characteristicDeallocated
     // Descriptors
     case descriptorsDiscoveryFailed(Characteristic, Error?)
     case descriptorWriteFailed(Descriptor, Error?)
@@ -91,6 +94,8 @@ extension BluetoothError: CustomStringConvertible {
             return "Peripheral disconnected with error: \(err?.localizedDescription ?? "-")"
         case let .peripheralRSSIReadFailed(_, err):
             return "RSSI read failed : \(err?.localizedDescription ?? "-")"
+        case .peripheralDeallocated:
+            return "Peripheral deallocated"
         // Services
         case let .servicesDiscoveryFailed(_, err):
             return "Services discovery error has occured: \(err?.localizedDescription ?? "-")"
@@ -98,6 +103,8 @@ extension BluetoothError: CustomStringConvertible {
             return "Included services discovery error has occured: \(err?.localizedDescription ?? "-")"
         case let .addingServiceFailed(_, err):
             return "Adding PeripheralManager service error has occured: \(err?.localizedDescription ?? "-")"
+        case .serviceDeallocated:
+            return "Service deallocated"
         // Characteristics
         case let .characteristicsDiscoveryFailed(_, err):
             return "Characteristics discovery error has occured: \(err?.localizedDescription ?? "-")"
@@ -109,6 +116,8 @@ extension BluetoothError: CustomStringConvertible {
             return "Characteristic notify change error has occured: \(err?.localizedDescription ?? "-")"
         case let .characteristicSetNotifyValueFailed(_, err):
             return "Characteristic isNotyfing value change error has occured: \(err?.localizedDescription ?? "-")"
+        case .characteristicDeallocated:
+            return "Characteristic deallocated"
         // Descriptors
         case let .descriptorsDiscoveryFailed(_, err):
             return "Descriptor discovery error has occured: \(err?.localizedDescription ?? "-")"

@@ -40,8 +40,8 @@ public class Characteristic {
         self.service = service
     }
 
-    convenience init(characteristic: CBCharacteristic, peripheral: Peripheral) {
-        let service = Service(peripheral: peripheral, service: characteristic.service)
+    convenience init(characteristic: CBCharacteristic, peripheral: Peripheral) throws {
+        let service = Service(peripheral: peripheral, service: try characteristic.unwrapService())
         self.init(characteristic: characteristic, service: service)
     }
 
@@ -189,4 +189,15 @@ extension Characteristic: UUIDIdentifiable {}
 /// - returns: True if both characteristics are the same.
 public func == (lhs: Characteristic, rhs: Characteristic) -> Bool {
     return lhs.characteristic == rhs.characteristic
+}
+
+extension CBCharacteristic {
+    /// Unwrap the parent service or throw if the service is nil
+    func unwrapService() throws -> CBService {
+        guard let cbService = service as CBService? else {
+            throw BluetoothError.serviceDeallocated
+        }
+
+        return cbService
+    }
 }

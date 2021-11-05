@@ -14,7 +14,8 @@ class CentralManagerTest_ObserveDisconnect: BaseCentralManagerTest {
         for stateWithError in _BluetoothError.invalidStateErrors {
             let (peripheral, obs) = setUpObserveDisconnect()
             let (state, error) = stateWithError
-            
+
+            wrapperMock.didUpdateState.onNext(BluetoothState(rawValue: state.rawValue)!)
             centralManagerMock.state = state
 
             testScheduler.advanceTo(subscribeTime)
@@ -32,7 +33,8 @@ class CentralManagerTest_ObserveDisconnect: BaseCentralManagerTest {
         for stateWithError in _BluetoothError.invalidStateErrors {
             let obs = setUpObserveDisconnectWithoutPeripheral()
             let (state, error) = stateWithError
-            
+
+            wrapperMock.didUpdateState.onNext(BluetoothState(rawValue: state.rawValue)!)
             centralManagerMock.state = state
             
             testScheduler.advanceTo(subscribeTime)

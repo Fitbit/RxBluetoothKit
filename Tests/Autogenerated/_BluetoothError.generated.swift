@@ -26,16 +26,19 @@ enum _BluetoothError: Error {
     case peripheralConnectionFailed(_Peripheral, Error?)
     case peripheralDisconnected(_Peripheral, Error?)
     case peripheralRSSIReadFailed(_Peripheral, Error?)
+    case peripheralDeallocated
     // Services
     case servicesDiscoveryFailed(_Peripheral, Error?)
     case includedServicesDiscoveryFailed(_Peripheral, Error?)
     case addingServiceFailed(CBServiceMock, Error?)
+    case serviceDeallocated
     // Characteristics
     case characteristicsDiscoveryFailed(_Service, Error?)
     case characteristicWriteFailed(_Characteristic, Error?)
     case characteristicReadFailed(_Characteristic, Error?)
     case characteristicNotifyChangeFailed(_Characteristic, Error?)
     case characteristicSetNotifyValueFailed(_Characteristic, Error?)
+    case characteristicDeallocated
     // Descriptors
     case descriptorsDiscoveryFailed(_Characteristic, Error?)
     case descriptorWriteFailed(_Descriptor, Error?)
@@ -87,11 +90,13 @@ extension _BluetoothError: CustomStringConvertible {
             connection (previously establishConnection subscription was not disposed).
             """
         case let .peripheralConnectionFailed(_, err):
-            return "Connection error has occured: \(err?.localizedDescription ?? "-")"
+            return "Connection failed with error: \(err?.localizedDescription ?? "-")"
         case let .peripheralDisconnected(_, err):
-            return "Connection error has occured: \(err?.localizedDescription ?? "-")"
+            return "_Peripheral disconnected with error: \(err?.localizedDescription ?? "-")"
         case let .peripheralRSSIReadFailed(_, err):
             return "RSSI read failed : \(err?.localizedDescription ?? "-")"
+        case .peripheralDeallocated:
+            return "_Peripheral deallocated"
         // Services
         case let .servicesDiscoveryFailed(_, err):
             return "Services discovery error has occured: \(err?.localizedDescription ?? "-")"
@@ -99,6 +104,8 @@ extension _BluetoothError: CustomStringConvertible {
             return "Included services discovery error has occured: \(err?.localizedDescription ?? "-")"
         case let .addingServiceFailed(_, err):
             return "Adding _PeripheralManager service error has occured: \(err?.localizedDescription ?? "-")"
+        case .serviceDeallocated:
+            return "_Service deallocated"
         // Characteristics
         case let .characteristicsDiscoveryFailed(_, err):
             return "Characteristics discovery error has occured: \(err?.localizedDescription ?? "-")"
@@ -110,6 +117,8 @@ extension _BluetoothError: CustomStringConvertible {
             return "_Characteristic notify change error has occured: \(err?.localizedDescription ?? "-")"
         case let .characteristicSetNotifyValueFailed(_, err):
             return "_Characteristic isNotyfing value change error has occured: \(err?.localizedDescription ?? "-")"
+        case .characteristicDeallocated:
+            return "_Characteristic deallocated"
         // Descriptors
         case let .descriptorsDiscoveryFailed(_, err):
             return "_Descriptor discovery error has occured: \(err?.localizedDescription ?? "-")"
