@@ -15,7 +15,8 @@ class CentralManagerTest_ScanForPeripherals: BaseCentralManagerTest {
         for stateWithError in _BluetoothError.invalidStateErrors {
             let observer = setUpScanForPeripherals(withServices: nil, options: nil)
             let (state, error) = stateWithError
-            
+
+            wrapperMock.didUpdateState.onNext(BluetoothState(rawValue: state.rawValue)!)
             centralManagerMock.state = state
             
             testScheduler.advanceTo(subscribeTime)

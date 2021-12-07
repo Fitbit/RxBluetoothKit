@@ -17,6 +17,7 @@ class PeripheralManagerTest_PublishL2CAP: BasePeripheralManagerTest {
             let observer = setUpPublishL2CAP(true)
             let (state, error) = stateWithError
 
+            wrapperMock.didUpdateState.onNext(BluetoothState(rawValue: state.rawValue)!)
             peripheralManagerMock.state = state
 
             testScheduler.advanceTo(subscribeTime)

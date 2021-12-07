@@ -16,6 +16,7 @@ class PeripheralManagerTest_AddService: BasePeripheralManagerTest {
             let obs = setUpAddService(createMutableService())
             let (state, error) = stateWithError
 
+            wrapperMock.didUpdateState.onNext(BluetoothState(rawValue: state.rawValue)!)
             peripheralManagerMock.state = state
 
             testScheduler.advanceTo(subscribeTime)

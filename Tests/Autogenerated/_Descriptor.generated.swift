@@ -29,9 +29,12 @@ class _Descriptor {
         self.characteristic = characteristic
     }
 
-    convenience init(descriptor: CBDescriptorMock, peripheral: _Peripheral) {
-        let service = _Service(peripheral: peripheral, service: descriptor.characteristic.service)
-        let characteristic = _Characteristic(characteristic: descriptor.characteristic, service: service)
+    convenience init(descriptor: CBDescriptorMock, peripheral: _Peripheral) throws {
+        let cbCharacteristic = try descriptor.unwrapCharacteristic()
+        let cbService = try cbCharacteristic.unwrapService()
+
+        let service = _Service(peripheral: peripheral, service: cbService)
+        let characteristic = _Characteristic(characteristic: cbCharacteristic, service: service)
         self.init(descriptor: descriptor, characteristic: characteristic)
     }
 
@@ -113,4 +116,15 @@ extension _Descriptor: Equatable {}
 /// - returns: True if both descriptor are the same.
 func == (lhs: _Descriptor, rhs: _Descriptor) -> Bool {
     return lhs.descriptor == rhs.descriptor
+}
+
+extension CBDescriptorMock {
+    /// Unwrap the parent characteristic or throw if the characteristic is nil
+    func unwrapCharacteristic() throws -> CBCharacteristicMock {
+        guard let cbCharacteristic = characteristic as CBCharacteristicMock? else {
+            throw _BluetoothError.characteristicDeallocated
+        }
+
+        return cbCharacteristic
+    }
 }

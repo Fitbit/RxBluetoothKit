@@ -1,4 +1,5 @@
 import Foundation
+import RxRelay
 import RxSwift
 import CoreBluetooth
 @testable import RxBluetoothKit
@@ -46,6 +47,11 @@ class _CentralManager: _ManagerType {
     /// ConnectorMock instance is used for establishing connection with peripherals
     private let connector: ConnectorMock
 
+    /// Relay that emits when the Bluetooth state changes. Replays the last emitted state.
+    private let stateRelay: BehaviorRelay<BluetoothState>
+
+    private let disposeBag = DisposeBag()
+
     // MARK: Initialization
 
     /// Creates new `_CentralManager`
@@ -64,6 +70,12 @@ class _CentralManager: _ManagerType {
         self.peripheralProvider = peripheralProvider
         self.connector = connector
         centralManager.delegate = delegateWrapper
+
+        self.stateRelay = BehaviorRelay(value: BluetoothState(rawValue: centralManager.state.rawValue) ?? .unknown)
+
+        self.delegateWrapper.didUpdateState.asObservable()
+            .bind(to: self.stateRelay)
+            .disposed(by: disposeBag)
     }
 
     /// Creates new `_CentralManager` instance. By default all operations and events are executed and received on main thread.
@@ -97,23 +109,15 @@ class _CentralManager: _ManagerType {
     // MARK: State
 
     var state: BluetoothState {
-        return BluetoothState(rawValue: manager.state.rawValue) ?? .unknown
+        return stateRelay.value
     }
 
     func observeState() -> Observable<BluetoothState> {
-        return self.delegateWrapper.didUpdateState.asObservable()
+        return observeStateWithInitialValue().skip(1)
     }
 
     func observeStateWithInitialValue() -> Observable<BluetoothState> {
-        return Observable.deferred { [weak self] in
-            guard let self = self else {
-                RxBluetoothKitLog.w("observeState - _CentralManager deallocated")
-                return .never()
-            }
-
-            return self.delegateWrapper.didUpdateState.asObservable()
-                .startWith(self.state)
-        }
+        return stateRelay.asObservable()
     }
 
     // MARK: Scanning

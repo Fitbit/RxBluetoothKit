@@ -1,6 +1,7 @@
 import Foundation
 import CoreBluetooth
 @testable import RxBluetoothKit
+import RxRelay
 import RxSwift
 
 /// _PeripheralManager is a class implementing ReactiveX API which wraps all the Core Bluetooth _Peripheral's functions, that allow to
@@ -32,6 +33,11 @@ class _PeripheralManager: _ManagerType {
     var isAdvertisingOngoing = false
     var restoredAdvertisementData: RestoredAdvertisementData?
 
+    /// Relay that emits when the Bluetooth state changes. Replays the last emitted state.
+    private let stateRelay: BehaviorRelay<BluetoothState>
+
+    private let disposeBag = DisposeBag()
+
     // MARK: Initialization
 
     /// Creates new `_PeripheralManager`
@@ -41,6 +47,12 @@ class _PeripheralManager: _ManagerType {
         self.manager = peripheralManager
         self.delegateWrapper = delegateWrapper
         peripheralManager.delegate = delegateWrapper
+
+        self.stateRelay = BehaviorRelay(value: BluetoothState(rawValue: peripheralManager.state.rawValue) ?? .unknown)
+
+        self.delegateWrapper.didUpdateState.asObservable()
+            .bind(to: self.stateRelay)
+            .disposed(by: disposeBag)
     }
 
     /// Creates new `_PeripheralManager` instance. By default all operations and events are executed and received on main thread.
@@ -73,23 +85,15 @@ class _PeripheralManager: _ManagerType {
     // MARK: State
 
     var state: BluetoothState {
-        return BluetoothState(rawValue: manager.state.rawValue) ?? .unknown
+        return stateRelay.value
     }
 
     func observeState() -> Observable<BluetoothState> {
-        return self.delegateWrapper.didUpdateState.asObservable()
+        return observeStateWithInitialValue().skip(1)
     }
 
     func observeStateWithInitialValue() -> Observable<BluetoothState> {
-        return Observable.deferred { [weak self] in
-            guard let self = self else {
-                RxBluetoothKitLog.w("observeState - _PeripheralManager deallocated")
-                return .never()
-            }
-
-            return self.delegateWrapper.didUpdateState.asObservable()
-                .startWith(self.state)
-        }
+        return stateRelay.asObservable()
     }
 
     // MARK: Advertising

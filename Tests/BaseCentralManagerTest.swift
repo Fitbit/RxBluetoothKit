@@ -11,6 +11,7 @@ class BaseCentralManagerTest: XCTestCase {
     
     func setUpProperties() {
         centralManagerMock = CBCentralManagerMock()
+        centralManagerMock.state = .poweredOn
         wrapperMock = CBCentralManagerDelegateWrapperMock()
         providerMock = PeripheralProviderMock()
         connectorMock = ConnectorMock()

@@ -24,6 +24,7 @@ class PeripheralManagerTest_StartAdvertising: BasePeripheralManagerTest {
             let observer = setUpStartAdvertising(nil)
             let (state, error) = stateWithError
 
+            wrapperMock.didUpdateState.onNext(BluetoothState(rawValue: state.rawValue)!)
             peripheralManagerMock.state = state
 
             testScheduler.advanceTo(subscribeTime)

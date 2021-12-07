@@ -28,9 +28,12 @@ public class Descriptor {
         self.characteristic = characteristic
     }
 
-    convenience init(descriptor: CBDescriptor, peripheral: Peripheral) {
-        let service = Service(peripheral: peripheral, service: descriptor.characteristic.service)
-        let characteristic = Characteristic(characteristic: descriptor.characteristic, service: service)
+    convenience init(descriptor: CBDescriptor, peripheral: Peripheral) throws {
+        let cbCharacteristic = try descriptor.unwrapCharacteristic()
+        let cbService = try cbCharacteristic.unwrapService()
+
+        let service = Service(peripheral: peripheral, service: cbService)
+        let characteristic = Characteristic(characteristic: cbCharacteristic, service: service)
         self.init(descriptor: descriptor, characteristic: characteristic)
     }
 
@@ -112,4 +115,15 @@ extension Descriptor: Equatable {}
 /// - returns: True if both descriptor are the same.
 public func == (lhs: Descriptor, rhs: Descriptor) -> Bool {
     return lhs.descriptor == rhs.descriptor
+}
+
+extension CBDescriptor {
+    /// Unwrap the parent characteristic or throw if the characteristic is nil
+    func unwrapCharacteristic() throws -> CBCharacteristic {
+        guard let cbCharacteristic = characteristic as CBCharacteristic? else {
+            throw BluetoothError.characteristicDeallocated
+        }
+
+        return cbCharacteristic
+    }
 }

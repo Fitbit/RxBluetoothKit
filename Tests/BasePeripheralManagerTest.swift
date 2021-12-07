@@ -9,6 +9,7 @@ class BasePeripheralManagerTest: XCTestCase {
 
     func setUpProperties() {
         peripheralManagerMock = CBPeripheralManagerMock()
+        peripheralManagerMock.state = .poweredOn
         wrapperMock = CBPeripheralManagerDelegateWrapperMock()
         peripheralManagerMock.isAdvertising = false
         manager = _PeripheralManager(
