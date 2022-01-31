@@ -106,6 +106,12 @@ public class Descriptor {
     }
 }
 
+extension Descriptor: CustomStringConvertible {
+    public var description: String {
+        return "\(type(of: self)) \(uuid)"
+    }
+}
+
 extension Descriptor: Equatable {}
 
 /// Compare two descriptors. Descriptors are the same when their UUIDs are the same.

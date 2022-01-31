@@ -303,13 +303,13 @@ class _CentralManager: _ManagerType {
                 return (peripheral, error)
             }
         return ensure(.poweredOn, observable: observable)
-                .catch { error in
-                    if error is _BluetoothError, let peripheral = peripheral {
-                        return .concat(.just((peripheral, error)), .error(error))
-                    } else {
-                        return .error(error)
-                    }
+            .catch { error in
+                if error is _BluetoothError, let peripheral = peripheral {
+                    return .concat(.just((peripheral, error)), .error(error))
+                } else {
+                    return .error(error)
                 }
+            }
     }
 
     // MARK: ANCS

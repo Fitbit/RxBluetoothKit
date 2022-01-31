@@ -180,6 +180,12 @@ class _Characteristic {
     }
 }
 
+extension _Characteristic: CustomStringConvertible {
+    var description: String {
+        return "\(type(of: self)) \(uuid)"
+    }
+}
+
 extension _Characteristic: Equatable {}
 extension _Characteristic: UUIDIdentifiable {}
 

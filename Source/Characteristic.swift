@@ -179,6 +179,12 @@ public class Characteristic {
     }
 }
 
+extension Characteristic: CustomStringConvertible {
+    public var description: String {
+        return "\(type(of: self)) \(uuid)"
+    }
+}
+
 extension Characteristic: Equatable {}
 extension Characteristic: UUIDIdentifiable {}
 

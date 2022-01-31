@@ -873,6 +873,12 @@ class _Peripheral {
     }
 }
 
+extension _Peripheral: CustomStringConvertible {
+    var description: String {
+        return "\(type(of: self)) \(peripheral.name ?? "nil") (\(peripheral.identifier))"
+    }
+}
+
 extension _Peripheral: Equatable {}
 
 /// Compare two peripherals which are the same when theirs identifiers are equal.
