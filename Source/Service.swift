@@ -80,6 +80,12 @@ public class Service {
     }
 }
 
+extension Service: CustomStringConvertible {
+    public var description: String {
+        return "\(type(of: self)) \(uuid)"
+    }
+}
+
 extension Service: Equatable {}
 extension Service: UUIDIdentifiable {}
 

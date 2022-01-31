@@ -81,6 +81,12 @@ class _Service {
     }
 }
 
+extension _Service: CustomStringConvertible {
+    var description: String {
+        return "\(type(of: self)) \(uuid)"
+    }
+}
+
 extension _Service: Equatable {}
 extension _Service: UUIDIdentifiable {}
 
